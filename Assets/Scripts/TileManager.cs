@@ -5,22 +5,16 @@ using UnityEngine;
 public class TileManager : MonoBehaviour {
     public GameObject[] tilePrefabs;
     public Transform playerTransform;
-    private float limitXRight = 60.0f;
+    private float limitXRight = 60f;
     private float limitXLeft = 0f;
-    private float limitYUp = 64f;
+    private float limitYUp = 60f;
     private float limitYDown = 0f;
-    private float lastY = 30.0f;
-    private float tileLength = 4.0f;
-    private int amnTilesOnScreen = 7;
     private float tileSize = 4f;
     private int tileCountX = 15;
     private int tileCountY = 15;
-    private float lastTilePosX;
-    private float lastTilePosY;
+    //public Tilemap map;
 	// Use this for initialization
 	void Start () {
-    lastTilePosX = tileSize* tileCountX;
-    lastTilePosY = 64f;
 }
     bool HasThePositionAnObject(Vector3 center, float radius)
     {
@@ -41,83 +35,134 @@ public class TileManager : MonoBehaviour {
             if(playerTransform.position.x > limitXRight-16f)
             {
                 tileCountX++;
-                SpawnTileForX(limitXRight,tileCountY,1f,limitYDown);
+
+                SpawnTileForX(limitXRight,tileCountY,-1f*limitYDown,1f);
                 limitXRight = limitXRight + tileSize;
+                limitXLeft = limitXLeft - tileSize;
+
             }
-            else if(playerTransform.position.x<limitXLeft+16f){
+            else if(playerTransform.position.x < -1f*limitXLeft+16f){
                 tileCountX++;
-                SpawnTileForX(limitXLeft, tileCountY,-1f,limitYDown);
+                SpawnTileForX(-1f*limitXLeft, tileCountY,-1f*limitYDown,-1f);
                 limitXLeft = limitXLeft + tileSize;
+                limitXRight = limitXRight - tileSize;
             }
             if (playerTransform.position.y > limitYUp - 16f)
             {
                 tileCountY++;
-                SpawnTileForY(tileCountX,limitYUp,1f,limitXLeft);
+                SpawnTileForY(tileCountX,limitYUp,-1f*limitXLeft,1f);
                 limitYUp = limitYUp + tileSize;
+                limitYDown = limitYDown - tileSize;
             }
-            else if (playerTransform.position.y < limitYDown + 16f)
+            else if (playerTransform.position.y < -1f*limitYDown + 16f)
             {
                 tileCountY++;
-                SpawnTileForY(tileCountX, limitYDown, - 1f,limitXLeft);
+                SpawnTileForY(tileCountX, -1f*limitYDown,-1f*limitXLeft,-1f);
                 limitYDown = limitYDown + tileSize;
+                limitYUp = limitYUp - tileSize;
             }
             playerTransform.hasChanged = false;
         }
 
 	}
 
-    private void SpawnTileForX(float x,int tileCountY,float route,float startPosY)
+    private void SpawnTileForX(float x,int tileCountY,float startPosY,float rotation)
     {
-        for(float i = startPosY; i < tileCountY*tileSize; i++)
+        bool canDeleted = true;
+        for(float i = startPosY; i <= tileCountY; i++)
         {
-            Vector3 vector = new Vector3(x*route, i * tileSize, 0);
+            Vector3 vector = new Vector3(x, i * tileSize, 0);
             if (!HasThePositionAnObject(vector, 0.1f))
             {
                 for (int prefab = 0; prefab < tilePrefabs.Length; prefab++)
                 {
                     GameObject go;
                     go = Instantiate(tilePrefabs[prefab]);
-                    go.transform.parent = GameObject.Find("TileManager").transform;
+                    go.transform.parent = GameObject.Find("Tilemap").transform;
                     go.transform.SetParent(transform);
                     go.transform.localPosition = vector;
-                    lastTilePosX += tileSize;
-
-                    Vector3 deletedObject = new Vector3(vector.x * -1f ,vector.y,0);
-                    DeleteObject(deletedObject, 0.1f);
+                    //lastTilePosX += tileSize;
                 }
             }
         }
-    }
-    private void SpawnTileForY(int tileCountX, float y,  float route,float startPosX)
-    {
-        for (float i = startPosX; i < tileCountX*tileSize; i++)
+        if (canDeleted)
         {
-            Vector3 vector = new Vector3( i * tileSize, y * route, 0);
+            if (rotation > 0)
+            {
+                MustDeleteObjects(-1f*limitYDown, startPosY, tileCountY, "x");
+
+            }
+            else
+            {
+                MustDeleteObjects(limitYUp, startPosY, tileCountY, "x");
+
+            }
+            canDeleted = false;
+        }
+    }
+    private void SpawnTileForY(int tileCountX, float y,float startPosX,float rotation)
+    {
+        bool canDeleted = true;
+        for (float i = startPosX; i <= tileCountX; i++)
+        {
+            Vector3 vector = new Vector3( i * tileSize, y, 0);
             if (!HasThePositionAnObject(vector, 0.1f))
             {
                 for (int prefab = 0; prefab < tilePrefabs.Length; prefab++)
                 {
                     GameObject go;
                     go = Instantiate(tilePrefabs[prefab]);
-                    go.transform.parent = GameObject.Find("TileManager").transform;
+                    go.transform.parent = GameObject.Find("Tilemap").transform;
                     go.transform.SetParent(transform);
                     go.transform.localPosition = vector;
-                    lastTilePosX += tileSize;
 
-                    Vector3 deletedObject = new Vector3(vector.x, vector.y * -1f, 0);
-                    DeleteObject(deletedObject, 0.1f);
                 }
             }
+
+        }
+        if (canDeleted)
+        {
+
+                MustDeleteObjects(-1f*limitXLeft, limitYDown*-1f, tileCountX, "y");
+
+            
+
+
+
+            canDeleted = false;
+        }
+
+    }
+
+    void MustDeleteObjects(float startPosX,float startPosY,float tileCount,string axis)
+    {
+        if (axis.Equals("x"))
+        {
+            for(float i = 0; i <= tileCount; i++)
+            {
+                Vector3 obj = new Vector3(startPosX, startPosY+tileSize*i, 0);
+                Die(obj, 0.1f);
+            }
+           tileCountX--;
+        }
+        else
+        {
+            for (float i = 0; i <= tileCount; i++)
+            {
+                Vector3 obj = new Vector3(startPosX + tileSize * i, startPosY, 0);
+                Die(obj, 0.1f);
+            }
+            tileCountY--;
         }
     }
 
-    void DeleteObject(Vector3 vector,float radius)
+    void Die(Vector3 vector,float radius)
     {
         Collider[] hitColliders = Physics.OverlapSphere(vector, radius);
         for(int i = 0; i < hitColliders.Length; i++)
         {
-            Destroy(hitColliders[i]);
-            Debug.Log("Destroyed");
+            Destroy(hitColliders[i].gameObject);
+            Debug.Log("Destroyed:"+hitColliders[i]);
         }
 
     }
