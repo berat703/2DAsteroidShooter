@@ -16,7 +16,6 @@ public class CameraFollow : MonoBehaviour {
         {
             Vector3 targPos = myTarget.position;
             targPos.z = transform.position.z;
-
             transform.position = targPos;
         }
 	}

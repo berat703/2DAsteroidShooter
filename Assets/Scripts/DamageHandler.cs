@@ -26,9 +26,6 @@ public class DamageHandler : MonoBehaviour {
         health--;
         invulnTimer = invulnPeriod;
         gameObject.layer = 10;
-
-        Debug.Log("Trigger!");
-
     }
 
     void Update()
