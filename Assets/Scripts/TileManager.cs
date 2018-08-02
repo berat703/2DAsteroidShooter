@@ -32,15 +32,14 @@ public class TileManager : MonoBehaviour {
     void Update () {
         if (playerTransform.hasChanged)
         {
-            if(limitXRight > playerTransform.position.x && playerTransform.position.x > limitXRight-12f)
+            if(limitXRight > playerTransform.position.x && playerTransform.position.x > limitXRight-16f)
             {
                 tileCountX++;
-
                 SpawnTileForX(limitXRight,tileCountY,limitYDown,1f);
                 limitXRight = limitXRight + tileSize;
                 limitXLeft = limitXLeft + tileSize;
             }
-            else if(playerTransform.position.x < limitXLeft+12f && playerTransform.position.x>limitXLeft){
+            else if(playerTransform.position.x < limitXLeft+16f && playerTransform.position.x>limitXLeft){
                 tileCountX++;
                 SpawnTileForX(limitXLeft, tileCountY,limitYDown,-1f);
                 limitXLeft = limitXLeft - tileSize;
@@ -49,16 +48,18 @@ public class TileManager : MonoBehaviour {
             if (playerTransform.position.y > limitYUp - 12f && limitYUp>playerTransform.position.y)
             {
                 tileCountY++;
-                SpawnTileForY(tileCountX,limitYUp,-1f*limitXLeft,1f);
+                SpawnTileForY(tileCountX,limitYUp,limitXLeft,1f);
                 limitYUp = limitYUp + tileSize;
                 limitYDown = limitYDown + tileSize;
+
             }
             else if (playerTransform.position.y < limitYDown + 12f && playerTransform.position.y>limitYDown)
             {
                 tileCountY++;
-                SpawnTileForY(tileCountX, limitYDown,-1f*limitXLeft,-1f);
+                SpawnTileForY(tileCountX, limitYDown,limitXLeft,-1f);
                 limitYDown = limitYDown - tileSize;
                 limitYUp = limitYUp - tileSize;
+
             }
             playerTransform.hasChanged = false;
         }
@@ -67,9 +68,9 @@ public class TileManager : MonoBehaviour {
 
     private void SpawnTileForX(float x,int tileCountY,float startPosY,float rotation)
     {
-        for(float i = startPosY; i <= tileCountY; i++)
+        for(float i = startPosY; i <= startPosY+tileCountY * tileSize; i=tileSize+i)
         {
-            Vector3 vector = new Vector3(x, i * tileSize, 0);
+            Vector3 vector = new Vector3(x+tileSize*rotation, i, 0);
             if (!HasThePositionAnObject(vector, 0.1f))
             {
                 for (int prefab = 0; prefab < tilePrefabs.Length; prefab++)
@@ -97,9 +98,9 @@ public class TileManager : MonoBehaviour {
     }
     private void SpawnTileForY(int tileCountX, float y,float startPosX,float rotation)
     {
-        for (float i = startPosX; i <= tileCountX*tileSize; i=tileSize+i)
+        for (float i = startPosX; i <= startPosX+tileCountX*tileSize; i=tileSize+i)
         {
-            Vector3 vector = new Vector3( i , y, 0);
+            Vector3 vector = new Vector3( i , y+tileSize*rotation, 0);
             if (!HasThePositionAnObject(vector, 0.1f))
             {
                 for (int prefab = 0; prefab < tilePrefabs.Length; prefab++)
@@ -121,7 +122,7 @@ public class TileManager : MonoBehaviour {
         }
         else
         {
-            MustDeleteObjects(-1f * limitXLeft, limitYUp, tileCountX, "y");
+            MustDeleteObjects(limitXLeft, limitYUp, tileCountX, "y");
 
         }
 
@@ -135,7 +136,7 @@ public class TileManager : MonoBehaviour {
             for(float i = 0; i <= tileCount; i++)
             {
                 Vector3 obj = new Vector3(startPosX, startPosY+tileSize*i, 0);
-                Die(obj, 0.1f);
+                Die(obj, 1f);
             }
            tileCountX--;
         }
@@ -144,7 +145,7 @@ public class TileManager : MonoBehaviour {
             for (float i = 0; i <= tileCount; i++)
             {
                 Vector3 obj = new Vector3(startPosX + tileSize * i, startPosY, 0);
-                Die(obj, 0.1f);
+                Die(obj, 1f);
             }
             tileCountY--;
         }
@@ -158,6 +159,8 @@ public class TileManager : MonoBehaviour {
             Destroy(hitColliders[i].gameObject);
             Debug.Log("Destroyed:"+hitColliders[i]);
         }
+        Collider[] hitCollidersForStone = Physics.OverlapSphere(vector, radius);
+
 
     }
 }
