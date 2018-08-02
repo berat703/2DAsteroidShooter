@@ -32,33 +32,32 @@ public class TileManager : MonoBehaviour {
     void Update () {
         if (playerTransform.hasChanged)
         {
-            if(playerTransform.position.x > limitXRight-16f)
+            if(limitXRight > playerTransform.position.x && playerTransform.position.x > limitXRight-12f)
             {
                 tileCountX++;
 
-                SpawnTileForX(limitXRight,tileCountY,-1f*limitYDown,1f);
+                SpawnTileForX(limitXRight,tileCountY,limitYDown,1f);
                 limitXRight = limitXRight + tileSize;
-                limitXLeft = limitXLeft - tileSize;
-
-            }
-            else if(playerTransform.position.x < -1f*limitXLeft+16f){
-                tileCountX++;
-                SpawnTileForX(-1f*limitXLeft, tileCountY,-1f*limitYDown,-1f);
                 limitXLeft = limitXLeft + tileSize;
+            }
+            else if(playerTransform.position.x < limitXLeft+12f && playerTransform.position.x>limitXLeft){
+                tileCountX++;
+                SpawnTileForX(limitXLeft, tileCountY,limitYDown,-1f);
+                limitXLeft = limitXLeft - tileSize;
                 limitXRight = limitXRight - tileSize;
             }
-            if (playerTransform.position.y > limitYUp - 16f)
+            if (playerTransform.position.y > limitYUp - 12f && limitYUp>playerTransform.position.y)
             {
                 tileCountY++;
                 SpawnTileForY(tileCountX,limitYUp,-1f*limitXLeft,1f);
                 limitYUp = limitYUp + tileSize;
-                limitYDown = limitYDown - tileSize;
+                limitYDown = limitYDown + tileSize;
             }
-            else if (playerTransform.position.y < -1f*limitYDown + 16f)
+            else if (playerTransform.position.y < limitYDown + 12f && playerTransform.position.y>limitYDown)
             {
                 tileCountY++;
-                SpawnTileForY(tileCountX, -1f*limitYDown,-1f*limitXLeft,-1f);
-                limitYDown = limitYDown + tileSize;
+                SpawnTileForY(tileCountX, limitYDown,-1f*limitXLeft,-1f);
+                limitYDown = limitYDown - tileSize;
                 limitYUp = limitYUp - tileSize;
             }
             playerTransform.hasChanged = false;
@@ -68,7 +67,6 @@ public class TileManager : MonoBehaviour {
 
     private void SpawnTileForX(float x,int tileCountY,float startPosY,float rotation)
     {
-        bool canDeleted = true;
         for(float i = startPosY; i <= tileCountY; i++)
         {
             Vector3 vector = new Vector3(x, i * tileSize, 0);
@@ -78,41 +76,37 @@ public class TileManager : MonoBehaviour {
                 {
                     GameObject go;
                     go = Instantiate(tilePrefabs[prefab]);
-                    go.transform.parent = GameObject.Find("Tilemap").transform;
+                    go.transform.parent = GameObject.Find("TileManager").transform;
                     go.transform.SetParent(transform);
                     go.transform.localPosition = vector;
                     //lastTilePosX += tileSize;
                 }
-            }
         }
-        if (canDeleted)
+    }
+        if (rotation > 0)
         {
-            if (rotation > 0)
-            {
-                MustDeleteObjects(-1f*limitYDown, startPosY, tileCountY, "x");
+            MustDeleteObjects(limitXLeft, startPosY, tileCountY, "x");
 
-            }
-            else
-            {
-                MustDeleteObjects(limitYUp, startPosY, tileCountY, "x");
-
-            }
-            canDeleted = false;
         }
+        else
+        {
+            MustDeleteObjects(limitXRight, startPosY, tileCountY, "x");
+
+        }
+
     }
     private void SpawnTileForY(int tileCountX, float y,float startPosX,float rotation)
     {
-        bool canDeleted = true;
-        for (float i = startPosX; i <= tileCountX; i++)
+        for (float i = startPosX; i <= tileCountX*tileSize; i=tileSize+i)
         {
-            Vector3 vector = new Vector3( i * tileSize, y, 0);
+            Vector3 vector = new Vector3( i , y, 0);
             if (!HasThePositionAnObject(vector, 0.1f))
             {
                 for (int prefab = 0; prefab < tilePrefabs.Length; prefab++)
                 {
                     GameObject go;
                     go = Instantiate(tilePrefabs[prefab]);
-                    go.transform.parent = GameObject.Find("Tilemap").transform;
+                    go.transform.parent = GameObject.Find("TileManager").transform;
                     go.transform.SetParent(transform);
                     go.transform.localPosition = vector;
 
@@ -120,17 +114,17 @@ public class TileManager : MonoBehaviour {
             }
 
         }
-        if (canDeleted)
+        if (rotation > 0)
         {
+            MustDeleteObjects(limitXLeft, limitYDown, tileCountX, "y");
 
-                MustDeleteObjects(-1f*limitXLeft, limitYDown*-1f, tileCountX, "y");
-
-            
-
-
-
-            canDeleted = false;
         }
+        else
+        {
+            MustDeleteObjects(-1f * limitXLeft, limitYUp, tileCountX, "y");
+
+        }
+
 
     }
 
