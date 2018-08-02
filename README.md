@@ -1,5 +1,5 @@
 # 2DAsteroidShooter
 Basic 2D Asteroid Shooter.Developed with Unity
 
-![alt text](https://i.hizliresim.com/MDVRJQ.png)
+![Screenshot](https://github.com/berat703/2DAsteroidShooter/raw/master/screenshot.png)
 
