@@ -6,12 +6,10 @@ public class QuitGame : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        Application.Quit();
 	}
 	
     public void quit()
     {
-        Debug.Log("quitted");
         Application.Quit();
     }
     // Update is called once per frame

@@ -1,6 +1,6 @@
 WindowsStandalone
 PlayerPath?
-C:/clones/Unity/Asteroid Shooter/Builds/Windows/x86/Asteroid Shooter.exe
+C:/clones/Unity/2DAsteroidShooter/Builds/Windows/Asteroid Shooter.exe
 SceneListBegin?
 Assets/Scenes/SampleScene.unity
 SceneListEnd?
@@ -177,3 +177,4 @@ ea3a82bfcc9f16272b2b80331f0e3c1e Assembly-CSharp.dll:.InitGame
 2f9af06a78208a67db480e9bfed4a076 Unity.TextMeshPro.dll:TMPro.TextMeshPro
 9318334b30e9f195f573b2ce00154b95 Unity.TextMeshPro.dll:TMPro.TMP_ColorGradient
 93307bd34e39d73fd24e00ec39c25a91 Unity.TextMeshPro.dll:TMPro.TMP_SubMesh
+8a4f0175d90bfa1c8db5b1504b8b4e3b Assembly-CSharp.dll:.CalculateFPS

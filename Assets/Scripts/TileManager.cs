@@ -157,7 +157,6 @@ public class TileManager : MonoBehaviour {
         for(int i = 0; i < hitColliders.Length; i++)
         {
             Destroy(hitColliders[i].gameObject);
-            Debug.Log("Destroyed:"+hitColliders[i]);
         }
         Collider[] hitCollidersForStone = Physics.OverlapSphere(vector, radius);
 
